@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
+import sys
 import requests
+from time import sleep
 import numpy as np
 
 
@@ -10,10 +12,17 @@ class Seventh:
         self.conn = requests.Session()
 
         self.set_state(self.connect())
+        self.initial = (self.account, self.holding)
 
     def connect(self):
-        assert self.conn.get(self.path + "/").text == "LIVE", "Connection refused"
-        return self.conn.get(self.path + "/data").json()
+        try:
+            assert self.conn.get(self.path + "/").text == "LIVE", "Connection refused"
+            print("Connection succeeded")
+            return self.conn.get(self.path + "/data").json()
+
+        except:
+            print("Connection failed")
+            exit()
 
     def set_state(self, state):
         self.historical = np.array(state["historical"])
@@ -36,23 +45,32 @@ class Seventh:
         )
 
     def strategy(self):
-        delta = self.historical[1:] - self.historical[:-1]
-        if (delta[-1] > 0) and (delta[-2] < 0):
+        if self.holding == 0:
             return self.buy()
 
-        elif (delta[-1] < 0) and (delta[-2] > 0):
-            return self.sell()
-
-        else:
-            return self.hold()
+        return self.sell(self.holding)
 
     def run(self, days):
         for _ in range(days):
             self.strategy()
+            sleep(2)
+
+    def eval(self):
+        results = f"""
+        ----- Backtrading Results -----
+        Initial Account: {self.initial[0]}
+        Final Account: {self.account}
+        Profit: {self.account - self.initial[0]}
+        Yield: {(self.account - self.initial[0])/self.initial[0]:.2f}%
+        """
+        return results
 
 
 if __name__ == "__main__":
-    client = Seventh("http://localhost:8000")
-    print(client.account, client.holding) 
+    flatten = lambda l: [item for sublist in l for item in sublist]
+    args = flatten(map(lambda s: s.split(":"), sys.argv))
+    assert len(args) == 3, "No server name given"
+
+    client = Seventh(f"http://{args[1]}:{args[2]}")
     client.run(10)
-    print(client.account, client.holding)
+    print(client.eval())
