@@ -20,12 +20,12 @@ class Seventh:
         self.buyprice, self.sellprice = state["buy"], state["sell"]
         self.account, self.holding = state["account"], state["holding"]
 
-    def sell(self, amount=1):  # Amount in BTC
+    def sell(self, amount=0.01):  # Amount in BTC
         self.set_state(
             self.conn.post(self.path + "/trade/sell", data={"amount": amount}).json()
         )
 
-    def buy(self, amount=1):  # Amount in USD
+    def buy(self, amount=100):  # Amount in USD
         self.set_state(
             self.conn.post(self.path + "/trade/buy", data={"amount": amount}).json()
         )
@@ -47,14 +47,12 @@ class Seventh:
             return self.hold()
 
     def run(self, days):
-        for _ in days:
+        for _ in range(days):
             self.strategy()
 
 
 if __name__ == "__main__":
     client = Seventh("http://localhost:8000")
-    print(client.account, client.holding)
-    client.buy(100)
-    print(client.account, client.holding)
-    client.sell(client.holding)
+    print(client.account, client.holding) 
+    client.run(10)
     print(client.account, client.holding)
