@@ -35,8 +35,20 @@ class Seventh:
             self.conn.post(self.path + "/trade/hold", data={"amount": 0}).json()
         )
 
-    def run(self):
-        pass
+    def strategy(self):
+        delta = self.historical[1:] - self.historical[:-1]
+        if (delta[-1] > 0) and (delta[-2] < 0):
+            return self.buy()
+
+        elif (delta[-1] < 0) and (delta[-2] > 0):
+            return self.sell()
+
+        else:
+            return self.hold()
+
+    def run(self, days):
+        for _ in days:
+            self.strategy()
 
 
 if __name__ == "__main__":
