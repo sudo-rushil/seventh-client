@@ -50,7 +50,7 @@ class Seventh:
     def run(self, days):
         for _ in range(days):
             self.strategy()
-            time.sleep(1)
+            time.sleep(0.5)
 
     def eval(self):
         results = f"""

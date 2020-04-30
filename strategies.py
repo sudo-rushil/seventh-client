@@ -10,7 +10,18 @@ class Trial(Seventh):
         return self.sell(self.holding)
 
 
-# class MAV(Seventh):
-#     def strategy(self):
-#         print(self.historical.dtype)
-#         return self.hold()
+class MAV(Seventh):
+    def strategy(self):
+        ten = self.historical[-10:].mean()
+        thirty = self.historical[-30:].mean()
+
+        if self.holding > 0:
+            return self.sell()
+
+        if self.holding < 0:
+            return self.buy()
+
+        if ten > thirty:
+            return self.sell(0.02)
+
+        return self.hold()
