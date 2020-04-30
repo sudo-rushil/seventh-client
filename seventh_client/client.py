@@ -3,6 +3,8 @@ import time
 import requests
 import numpy as np
 
+from progress.bar import Bar
+
 
 class Seventh:
     def __init__(self, path):
@@ -48,7 +50,7 @@ class Seventh:
         return self.hold()
 
     def run(self, days):
-        for _ in range(days):
+        for _ in Bar("Running", fill="=", suffix="%(eta)d sec left").iter(range(days)):
             self.strategy()
             time.sleep(0.5)
 

@@ -25,3 +25,23 @@ class MAV(Seventh):
             return self.sell(0.02)
 
         return self.hold()
+
+
+class Random(Seventh):
+    def resolve_strategy(self):
+        if self.holding > 0:
+            return self.sell()
+
+        if self.holding < 0:
+            return self.buy()
+
+    def strategy(self):
+        delta = self.historical[1:] - self.historical[:-1]
+
+        if self.holding != 0:
+            return self.resolve_strategy()
+
+        if delta[-10:].mean() > 0:
+            return self.buy()
+
+        return self.sell(0.02)
