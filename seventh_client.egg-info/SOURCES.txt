@@ -1,0 +1,13 @@
+README.md
+setup.cfg
+setup.py
+seventh_client/__init__.py
+seventh_client/__main__.py
+seventh_client/cli.py
+seventh_client/client.py
+seventh_client.egg-info/PKG-INFO
+seventh_client.egg-info/SOURCES.txt
+seventh_client.egg-info/dependency_links.txt
+seventh_client.egg-info/entry_points.txt
+seventh_client.egg-info/requires.txt
+seventh_client.egg-info/top_level.txt

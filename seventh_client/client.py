@@ -1,8 +1,6 @@
-#!/usr/bin/env python
-
 import sys
+import time
 import requests
-from time import sleep
 import numpy as np
 
 
@@ -29,7 +27,9 @@ class Seventh:
         self.buyprice, self.sellprice = state["buy"], state["sell"]
         self.account, self.holding = state["account"], state["holding"]
 
-    def sell(self, amount=0.01):  # Amount in BTC
+    def sell(self, amount=None):  # Amount in BTC
+        if amount is None:
+            amount = self.holding
         self.set_state(
             self.conn.post(self.path + "/trade/sell", data={"amount": amount}).json()
         )
@@ -45,15 +45,12 @@ class Seventh:
         )
 
     def strategy(self):
-        if self.holding == 0:
-            return self.buy()
-
-        return self.sell(self.holding)
+        return self.hold()
 
     def run(self, days):
         for _ in range(days):
             self.strategy()
-            sleep(2)
+            time.sleep(1)
 
     def eval(self):
         results = f"""
@@ -64,13 +61,3 @@ class Seventh:
         Yield: {(self.account - self.initial[0])/self.initial[0]:.2f}%
         """
         return results
-
-
-if __name__ == "__main__":
-    flatten = lambda l: [item for sublist in l for item in sublist]
-    args = flatten(map(lambda s: s.split(":"), sys.argv))
-    assert len(args) == 3, "No server name given"
-
-    client = Seventh(f"http://{args[1]}:{args[2]}")
-    client.run(10)
-    print(client.eval())
