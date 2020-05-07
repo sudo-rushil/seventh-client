@@ -54,12 +54,17 @@ class Seventh:
             self.strategy()
             time.sleep(0.5)
 
+        if self.holding > 0:
+            self.sell()
+        elif self.holding < 0:
+            self.buy(self.holding * self.buyprice)
+
     def eval(self):
         results = f"""
         ----- Backtrading Results -----
         Initial Account: {self.initial[0]}
         Final Account: {self.account}
         Profit: {self.account - self.initial[0]}
-        Yield: {(self.account - self.initial[0])/self.initial[0]:.2f}%
+        Yield: {100 * (self.account - self.initial[0])/self.initial[0]:.2f}%
         """
         return results

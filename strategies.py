@@ -45,3 +45,19 @@ class Random(Seventh):
             return self.buy()
 
         return self.sell(0.02)
+
+
+class SizedMAV(Seventh):
+    def strategy(self, size=0.8):
+        delta = self.historical[1:] - self.historical[:-1]
+
+        if self.holding > 0:
+            return self.sell()
+
+        if self.holding < 0:
+            return self.buy()
+
+        if delta[-10:].mean() > 0:
+            return self.buy(self.account * size)
+
+        return self.sell(size)
