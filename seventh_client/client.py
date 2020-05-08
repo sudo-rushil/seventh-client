@@ -36,7 +36,9 @@ class Seventh:
             self.conn.post(self.path + "/trade/sell", data={"amount": amount}).json()
         )
 
-    def buy(self, amount=100):  # Amount in USD
+    def buy(self, amount=None):  # Amount in USD
+        if amount is None:
+            amount = abs(self.holding * self.buyprice)
         self.set_state(
             self.conn.post(self.path + "/trade/buy", data={"amount": amount}).json()
         )
@@ -46,6 +48,13 @@ class Seventh:
             self.conn.post(self.path + "/trade/hold", data={"amount": 0}).json()
         )
 
+    def resolve_strategy(self):
+        if self.holding > 0:
+            return self.sell()
+
+        if self.holding < 0:
+            return self.buy()
+
     def strategy(self):
         return self.hold()
 
@@ -54,6 +63,7 @@ class Seventh:
             self.strategy()
             time.sleep(0.5)
 
+        # Purge account holdings
         if self.holding > 0:
             self.sell()
         elif self.holding < 0:
@@ -64,6 +74,7 @@ class Seventh:
         ----- Backtrading Results -----
         Initial Account: {self.initial[0]}
         Final Account: {self.account}
+        Final Holdings: {self.holding}
         Profit: {self.account - self.initial[0]}
         Yield: {100 * (self.account - self.initial[0])/self.initial[0]:.2f}%
         """

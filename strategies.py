@@ -28,13 +28,6 @@ class MAV(Seventh):
 
 
 class Random(Seventh):
-    def resolve_strategy(self):
-        if self.holding > 0:
-            return self.sell()
-
-        if self.holding < 0:
-            return self.buy()
-
     def strategy(self):
         delta = self.historical[1:] - self.historical[:-1]
 
@@ -48,14 +41,11 @@ class Random(Seventh):
 
 
 class SizedMAV(Seventh):
-    def strategy(self, size=0.8):
+    def strategy(self, size=0.4):
         delta = self.historical[1:] - self.historical[:-1]
 
-        if self.holding > 0:
-            return self.sell()
-
-        if self.holding < 0:
-            return self.buy()
+        if self.holding != 0:
+            return self.resolve_strategy()
 
         if delta[-10:].mean() > 0:
             return self.buy(self.account * size)
