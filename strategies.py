@@ -51,3 +51,16 @@ class SizedMAV(Seventh):
             return self.buy(self.account * size)
 
         return self.sell(size)
+
+
+class Stochastic(Seventh):
+    def strategy(self, size=0.4):
+        delta = self.historical[1:] - self.historical[:-1]
+
+        if self.holding != 0:
+            return self.resolve_strategy()
+
+        if not (delta[-10:].mean() > 0 or np.random.uniform() > 0.7):
+            return self.buy(self.account * size)
+
+        return self.sell(size)
